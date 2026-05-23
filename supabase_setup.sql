@@ -32,3 +32,16 @@ CREATE POLICY "Public insert" ON public.messages
 -- (Do this in Supabase Dashboard → Database → Replication → messages table)
 -- Or run:
 ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+
+-- ════════════════════════════════════════
+-- NormBot AI — Database Webhook
+-- After deploying the edge function, create the webhook in:
+-- Supabase Dashboard → Database → Webhooks → Create a new hook
+--
+-- Settings:
+--   Name:          ai-bot-trigger
+--   Table:         messages
+--   Events:        INSERT
+--   Type:          Supabase Edge Functions
+--   Edge Function: ai-bot
+-- ════════════════════════════════════════

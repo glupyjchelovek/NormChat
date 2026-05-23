@@ -11,6 +11,10 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ── Constants ─────────────────────────────
+const BOT_USERNAME = 'NormBot';   // must match edge function exactly
+const BOT_THINKING_DELAY = 800;   // ms before showing "thinking" bubble
+const BOT_THINKING_MAX   = 12000; // ms max before hiding thinking bubble
+
 const AVATARS = [
   '🐱','🐶','🦊','🐼','🐻','🦁','🐸','🐙',
   '🦄','🐝','🦋','🐧','🦖','🐳','🦈','🐨',
@@ -33,6 +37,8 @@ let typingTimer = null;
 let isTyping = false;
 let typingUsers = {};      // { username: timeoutId }
 let emojiPickerOpen = false;
+let botThinkingTimer = null;
+let botThinkingEl = null;
 
 // ── DOM refs ──────────────────────────────
 const welcomeScreen  = document.getElementById('welcome-screen');
@@ -218,9 +224,27 @@ function subscribeRealtime() {
     .on('postgres_changes', {
       event: 'INSERT', schema: 'public', table: 'messages'
     }, payload => {
+      const msg = payload.new;
+
+      // Hide bot thinking bubble when bot message arrives
+      if (msg.username === BOT_USERNAME) {
+        hideBotThinking();
+      }
+
+      // Don't double-render optimistic messages from self
+      if (msg.username === user.username) {
+        const opt = document.querySelector('[data-id^="opt-"]');
+        if (opt) { opt.dataset.id = msg.id; return; }
+      }
+
       removeEmptyState();
-      renderMessage(payload.new);
+      renderMessage(msg);
       scrollToBottom(true);
+
+      // Show bot thinking animation after non-bot messages
+      if (msg.username !== BOT_USERNAME) {
+        showBotThinkingAfterDelay();
+      }
     })
     // Typing broadcast
     .on('broadcast', { event: 'typing' }, ({ payload }) => {
@@ -239,13 +263,52 @@ function subscribeRealtime() {
     });
 }
 
+// ── Bot thinking animation ─────────────────
+function showBotThinkingAfterDelay() {
+  clearTimeout(botThinkingTimer);
+  botThinkingTimer = setTimeout(() => {
+    hideBotThinking(); // remove any existing one first
+    botThinkingEl = document.createElement('div');
+    botThinkingEl.className = 'bot-thinking';
+    botThinkingEl.id = 'bot-thinking';
+    botThinkingEl.innerHTML = `
+      <div class="bt-avatar">🤖</div>
+      <div class="bt-bubble">
+        <div class="bt-dot"></div>
+        <div class="bt-dot"></div>
+        <div class="bt-dot"></div>
+      </div>
+    `;
+    messagesInner.appendChild(botThinkingEl);
+    scrollToBottom(true);
+
+    // Safety timeout — hide if bot never responds
+    clearTimeout(botThinkingTimer);
+    botThinkingTimer = setTimeout(hideBotThinking, BOT_THINKING_MAX);
+  }, BOT_THINKING_DELAY);
+}
+
+function hideBotThinking() {
+  clearTimeout(botThinkingTimer);
+  if (botThinkingEl) {
+    botThinkingEl.remove();
+    botThinkingEl = null;
+  }
+  const el = document.getElementById('bot-thinking');
+  if (el) el.remove();
+}
+
 // ── Render a single message ────────────────
 function renderMessage(msg) {
   const isMine = msg.username === user.username;
+  const isBot  = msg.username === BOT_USERNAME;
   const isEmojiOnly = isOnlyEmoji(msg.content);
 
   const row = document.createElement('div');
-  row.className = 'msg-row' + (isMine ? ' mine' : '');
+  const classes = ['msg-row'];
+  if (isMine) classes.push('mine');
+  if (isBot)  classes.push('bot-msg');
+  row.className = classes.join(' ');
   row.dataset.id = msg.id;
 
   const avatar = document.createElement('div');
@@ -258,7 +321,11 @@ function renderMessage(msg) {
   if (!isMine) {
     const uname = document.createElement('div');
     uname.className = 'msg-username';
-    uname.textContent = msg.username;
+    if (isBot) {
+      uname.innerHTML = `${msg.username} <span class="bot-badge">AI</span>`;
+    } else {
+      uname.textContent = msg.username;
+    }
     group.appendChild(uname);
   }
 
@@ -365,6 +432,9 @@ async function sendMessage() {
   renderMessage(optimistic);
   scrollToBottom(true);
 
+  // Show bot thinking right away (user sent, bot will respond)
+  showBotThinkingAfterDelay();
+
   // Insert to Supabase
   const { error } = await db.from('messages').insert({
     username: user.username,
@@ -374,7 +444,7 @@ async function sendMessage() {
 
   if (error) {
     console.error('Send error:', error);
-    // Remove optimistic bubble on error
+    hideBotThinking();
     const el = document.querySelector(`[data-id="${optimistic.id}"]`);
     if (el) el.remove();
     alert('Message failed to send. Please try again.');

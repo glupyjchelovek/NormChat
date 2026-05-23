@@ -436,6 +436,91 @@ html, body {
   .emoji-picker { grid-template-columns: repeat(7, 1fr); left: 8px; }
 }
 
+/* ══════════════════════════════════════
+   BOT MESSAGE STYLES
+══════════════════════════════════════ */
+
+/* Bot row — treated like a "received" message but with special colors */
+.msg-row.bot-msg .msg-bubble {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  border-bottom-left-radius: 6px;
+  box-shadow: 0 3px 12px rgba(17, 153, 142, 0.3);
+}
+
+.msg-row.bot-msg .msg-username {
+  color: #0d9373;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bot-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* Bot avatar gets a glowing ring */
+.msg-row.bot-msg .msg-avatar {
+  box-shadow: 0 0 0 3px rgba(17,153,142,0.35), 0 2px 8px rgba(0,0,0,0.12);
+  background: #e6fdf9;
+}
+
+/* NormBot is thinking — a green typing pulse */
+.bot-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  max-width: 800px;
+  margin: 4px auto;
+  width: 100%;
+  animation: msgIn 0.25s ease;
+}
+
+.bot-thinking .bt-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #e6fdf9;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px rgba(17,153,142,0.3);
+  flex-shrink: 0;
+}
+
+.bot-thinking .bt-bubble {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  border-radius: 18px 18px 18px 6px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 3px 12px rgba(17,153,142,0.25);
+}
+
+.bt-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  animation: botPulse 1.2s infinite;
+}
+.bt-dot:nth-child(2) { animation-delay: 0.2s; }
+.bt-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes botPulse {
+  0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
+  30%            { transform: scale(1.4); opacity: 1; }
+}
+
 /* ─── Confetti burst on join ─── */
 .confetti-container {
   position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden;
