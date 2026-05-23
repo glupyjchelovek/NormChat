@@ -11,7 +11,8 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ── Constants ─────────────────────────────
-const BOT_USERNAME = 'NormBot';   // must match edge function exactly
+const BOT_USERNAME = 'Иван';      // must match edge function exactly
+const BOT_AVATAR_IMG = '/assets/ivan.png';
 const BOT_THINKING_DELAY = 800;   // ms before showing "thinking" bubble
 const BOT_THINKING_MAX   = 12000; // ms max before hiding thinking bubble
 
@@ -272,7 +273,7 @@ function showBotThinkingAfterDelay() {
     botThinkingEl.className = 'bot-thinking';
     botThinkingEl.id = 'bot-thinking';
     botThinkingEl.innerHTML = `
-      <div class="bt-avatar">🤖</div>
+      <div class="bt-avatar"><img src="${BOT_AVATAR_IMG}" alt="Иван" /></div>
       <div class="bt-bubble">
         <div class="bt-dot"></div>
         <div class="bt-dot"></div>
@@ -313,7 +314,14 @@ function renderMessage(msg) {
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  avatar.textContent = msg.avatar;
+  if (msg.avatar && (msg.avatar.startsWith('/') || msg.avatar.startsWith('http'))) {
+    const img = document.createElement('img');
+    img.src = msg.avatar;
+    img.alt = msg.username;
+    avatar.appendChild(img);
+  } else {
+    avatar.textContent = msg.avatar;
+  }
 
   const group = document.createElement('div');
   group.className = 'msg-group';

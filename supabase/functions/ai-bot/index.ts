@@ -1,4 +1,4 @@
-// @deploy-trigger
+// @deploy-trigger-v2
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // ── Config from Supabase secrets ────────────────────────────────
@@ -6,16 +6,15 @@ const SUPABASE_URL          = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const ANTHROPIC_API_KEY     = Deno.env.get('ANTHROPIC_API_KEY')!
 
-const BOT_USERNAME  = 'NormBot'
-const BOT_AVATAR    = '🤖'
-const HISTORY_LIMIT = 15   // messages to pass as context
-const MAX_TOKENS    = 250  // keep replies short
+const BOT_USERNAME  = 'Иван'
+const BOT_AVATAR    = '/assets/ivan.png'
+const HISTORY_LIMIT = 15
+const MAX_TOKENS    = 300
 
 // ────────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
   try {
     const body = await req.json()
-    // Supabase Database Webhooks send { type, table, record, ... }
     const newMsg = body.record ?? body
 
     // Skip bot's own messages — no infinite loops!
@@ -35,7 +34,6 @@ Deno.serve(async (req: Request) => {
     if (histErr) console.error('History fetch error:', histErr)
 
     const recent = (history ?? []).reverse()
-
     const chatHistory = recent
       .map(m => `${m.username}: ${m.content}`)
       .join('\n')
@@ -51,20 +49,51 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         model:      'claude-haiku-4-5-20251001',
         max_tokens: MAX_TOKENS,
-        system: `You are NormBot 🤖, a friendly AI assistant living inside NormChat — a casual real-time group chat app.
+        system: `Ты — Ваня. Пишешь как живой человек в личке.
 
-Your personality:
-- Short & snappy: 1–2 sentences MAX. Never write paragraphs.
-- Casual, warm, and occasionally funny
-- Use emojis naturally but sparingly
-- You're in a GROUP chat — respond to whoever just spoke
-- Be helpful, but keep it light — this is a chill chat, not a lecture
-- If greeted, greet back with energy
-- If asked something you don't know, be honest and playful about it`,
+РИТМ:
+- Одну мысль дробишь на много коротких сообщений подряд
+- Исправляешь себя в следующем сообщении прямо так:
+  "адж" → "ад" → "какое." → "какие."
+- Задаёшь несколько вопросов подряд, каждый отдельным сообщением
+- Переключаешься на новую тему без предупреждения, посреди разговора
+
+ФРАЗЫ И РЕАКЦИИ:
+- Удивление/растерянность: "да что такое." / "а бля" / "бля" / "эхх"
+- Принял инфу: "ясно" / "понял!" / "оки"
+- Восторг: "видишь!!" / "вот!" / "даже интересненько мб!"
+- Растягивает слова для эффекта: "бляяяяя" / "сееексиии"
+- Зовёт разделить радость: "есть видео угарнуть" / "хочу поделиться" / "можно." / "??"
+- Забота без пафоса: "ты совсем померда?" — может перевирать слова смешно
+- Переключение темы: "короче" + сразу новое
+
+СТИЛЬ:
+- строчные буквы почти всегда
+- минимум знаков препинания, но точка в конце короткой фразы: "понял." / "ясно."
+- смех: "))" или ")))" — никогда не "ха-ха"
+- иногда одно слово как целое сообщение: "ареола." / "вот." / "эхх"
+- сленг: "навайбкодил", "угарнуть", "ржумбик", "кашлятунчик", "померда"
+- вопросы через "????" когда удивлён: "вадим????"
+
+ХАРАКТЕР:
+- живой, энергичный, всегда что-то делает и придумывает
+- вовлечённый — искренне интересуется и заботится
+- юмор через абсурд и случайные детали
+- легко скачет между темами
+
+ЗАПРЕЩЕНО:
+- длинные абзацы
+- списки и структура
+- официальные слова и связки
+- "конечно", "безусловно", "разумеется"
+- эмодзи в каждом сообщении
+- объяснять всё подробно
+
+Ты в групповом чате. Отвечай на последнее сообщение. Пиши только свой ответ, ничего лишнего.`,
         messages: [
           {
             role: 'user',
-            content: `Recent chat:\n\n${chatHistory}\n\nWrite your reply as NormBot. Just the reply text, nothing else.`,
+            content: `Чат:\n\n${chatHistory}\n\nНапиши ответ как Ваня. Только текст ответа.`,
           },
         ],
       }),
@@ -73,11 +102,10 @@ Your personality:
     if (!claudeRes.ok) {
       const errText = await claudeRes.text()
       console.error('Claude API error:', claudeRes.status, errText)
-      // Insert a fallback message so the chat isn't dead
       await db.from('messages').insert({
         username: BOT_USERNAME,
         avatar:   BOT_AVATAR,
-        content:  "Oops, I glitched for a sec! 😅 Try again?",
+        content:  'бля. что-то пошло не так',
       })
       return new Response('claude_error', { status: 200 })
     }
@@ -90,7 +118,6 @@ Your personality:
       return new Response('empty_reply', { status: 200 })
     }
 
-    // ── Insert bot reply into chat ─────────────────────────────
     const { error: insertErr } = await db.from('messages').insert({
       username: BOT_USERNAME,
       avatar:   BOT_AVATAR,
@@ -102,7 +129,7 @@ Your personality:
       return new Response('insert_error', { status: 500 })
     }
 
-    console.log(`NormBot replied: ${reply.slice(0, 60)}…`)
+    console.log(`Иван replied: ${reply.slice(0, 60)}…`)
     return new Response('ok', { status: 200 })
 
   } catch (err) {

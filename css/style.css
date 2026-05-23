@@ -473,6 +473,18 @@ html, body {
 .msg-row.bot-msg .msg-avatar {
   box-shadow: 0 0 0 3px rgba(17,153,142,0.35), 0 2px 8px rgba(0,0,0,0.12);
   background: #e6fdf9;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Image avatars (bot uses a real photo) */
+.msg-avatar img,
+.bt-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
 
 /* NormBot is thinking — a green typing pulse */
