@@ -6,10 +6,7 @@
   <title>NormChat 💬</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -24,20 +21,14 @@
 
       <div class="form-section">
         <label class="field-label">Your name</label>
-        <input
-          id="name-input"
-          class="name-input"
-          type="text"
-          placeholder="Enter your name…"
-          maxlength="20"
-          autocomplete="off"
-        />
+        <input id="name-input" class="name-input" type="text"
+          placeholder="Enter your name…" maxlength="20" autocomplete="off" />
       </div>
 
       <div class="form-section">
         <label class="field-label">Pick your avatar</label>
         <div class="avatar-grid" id="avatar-grid">
-          <!-- avatars injected by JS -->
+          <!-- photo avatars injected by JS -->
         </div>
       </div>
 
@@ -45,7 +36,6 @@
         <span>Join Chat</span>
         <span class="btn-arrow">→</span>
       </button>
-
       <p id="welcome-error" class="welcome-error hidden">Please enter a name and pick an avatar!</p>
     </div>
   </div>
@@ -63,21 +53,37 @@
         </div>
       </div>
       <div class="header-right">
-        <div class="my-avatar-badge" id="my-avatar-badge">
-          <span id="my-avatar-display"></span>
-        </div>
+        <!-- Online users toggle -->
+        <button class="online-toggle-btn" id="online-toggle-btn" title="Who's online">
+          <span class="online-dot"></span>
+          <span id="online-count-badge">0</span>
+        </button>
+        <!-- My profile -->
+        <div class="my-avatar-badge" id="my-avatar-badge"></div>
         <span class="my-name-display" id="my-name-display"></span>
         <button class="logout-btn" id="logout-btn" title="Change profile">✏️</button>
       </div>
     </header>
 
+    <!-- Online users panel (slides from right) -->
+    <div class="online-panel" id="online-panel">
+      <div class="online-panel-header">
+        <div>
+          <span class="online-panel-title">Online now</span>
+          <span class="online-panel-count" id="online-panel-count">0</span>
+        </div>
+        <button class="online-close-btn" id="online-close-btn">✕</button>
+      </div>
+      <div class="online-list" id="online-list">
+        <!-- users injected by JS -->
+      </div>
+    </div>
+    <div class="panel-backdrop hidden" id="panel-backdrop"></div>
+
     <!-- Messages area -->
     <div class="messages-area" id="messages-area">
       <div class="messages-inner" id="messages-inner">
-        <div class="chat-day-divider">
-          <span>Today</span>
-        </div>
-        <!-- messages injected here -->
+        <div class="chat-day-divider"><span>Today</span></div>
       </div>
     </div>
 
@@ -91,13 +97,8 @@
     <div class="input-bar">
       <div class="input-wrap">
         <button class="emoji-btn" id="emoji-btn" title="Emoji">😊</button>
-        <textarea
-          id="msg-input"
-          class="msg-input"
-          placeholder="Type a message…"
-          rows="1"
-          maxlength="1000"
-        ></textarea>
+        <textarea id="msg-input" class="msg-input" placeholder="Type a message…"
+          rows="1" maxlength="1000"></textarea>
         <button class="send-btn" id="send-btn" title="Send">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -105,16 +106,30 @@
           </svg>
         </button>
       </div>
+      <div class="emoji-picker hidden" id="emoji-picker"></div>
+    </div>
 
-      <!-- Simple emoji picker -->
-      <div class="emoji-picker hidden" id="emoji-picker">
-        <!-- emojis injected by JS -->
+    <!-- 🎵 Music widget (floating) -->
+    <div class="music-widget" id="music-widget">
+      <div class="music-player-card hidden" id="music-player-card">
+        <div class="music-card-header">
+          <div class="music-card-info">
+            <span class="music-note-spin">🎵</span>
+            <div>
+              <div class="music-song-title">Камин</div>
+              <div class="music-song-artist">EMIN feat. JONY</div>
+            </div>
+          </div>
+          <button class="music-card-close" id="music-card-close">✕</button>
+        </div>
+        <iframe id="music-iframe" src="" width="100%" height="80"
+          frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
+      <button class="music-fab" id="music-fab" title="В камине в 6 утра 🎵">🎵</button>
     </div>
 
   </div>
 
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/app.js"></script>
 </body>
