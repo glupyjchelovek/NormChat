@@ -12,17 +12,17 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ── Constants ─────────────────────────────
 const BOT_USERNAME     = 'Иван';
-const BOT_AVATAR_IMG   = '/assets/ivan.png';
+const BOT_AVATAR_IMG   = '/assets/ivan.png.jpg';
 const BOT_THINKING_DELAY = 800;
 const BOT_THINKING_MAX   = 12000;
 const TYPING_TIMEOUT     = 2500;
 
-// 12 photo avatars — user uploads these to /assets/
+// 12 photo avatars
 const AVATARS = [
-  '/assets/av1.png',  '/assets/av2.png',  '/assets/av3.png',
-  '/assets/av4.png',  '/assets/av5.png',  '/assets/av6.png',
-  '/assets/av7.png',  '/assets/av8.png',  '/assets/av9.png',
-  '/assets/av10.png', '/assets/av11.png', '/assets/av12.png',
+  '/assets/av1.png.jpg',  '/assets/av2.png.jpg',  '/assets/av3.png.jpg',
+  '/assets/av4.png.jpg',  '/assets/av5.png.jpg',  '/assets/av6.png.jpg',
+  '/assets/av7.png.jpg',  '/assets/av8.png.jpg',  '/assets/av9.png.jpg',
+  '/assets/av10.png.jpg', '/assets/av11.png.jpg', '/assets/av12.png.jpg',
 ];
 
 // Fallback colors if image fails to load

@@ -7,7 +7,7 @@ const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const ANTHROPIC_API_KEY     = Deno.env.get('ANTHROPIC_API_KEY')!
 
 const BOT_USERNAME  = 'Иван'
-const BOT_AVATAR    = '/assets/ivan.png'
+const BOT_AVATAR    = '/assets/ivan.png.jpg'
 const HISTORY_LIMIT = 15
 const MAX_TOKENS    = 300
 
