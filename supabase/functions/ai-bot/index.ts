@@ -1,3 +1,4 @@
+// @deploy-trigger
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // ── Config from Supabase secrets ────────────────────────────────
